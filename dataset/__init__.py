@@ -8,10 +8,25 @@ from dataset.persistence.util import sqlite_datetime_fix
 from dataset.persistence.database import Database
 from dataset.persistence.table import Table
 from dataset.freeze.app import freeze
-
+import sqlite3
 __all__ = ['Database', 'Table', 'freeze', 'connect']
 
-
+def createsqlite3(name,sql=None,file=None):
+    db=sqlite3.connect(name)
+    if sql is None and file is None:
+        raise ValueError("Either sql or file paramter must be supplied to create a database")
+        return False
+    elif sql is None:
+        if file.split('.')[-1]!='sql':
+            raise TypeError("Only sql extension is supported for creating database from file")
+        else:
+            with open(file,'r') as f:
+                data=f.read()
+            db.cursor().execute(data)
+    elif file is None:
+        db.cursor().execute(sql)
+    return True
+        db.cursor().execute()
 def connect(url=None, schema=None, reflectMetadata=True, engine_kwargs=None):
     """
     Opens a new connection to a database. *url* can be any valid `SQLAlchemy engine URL`_.
